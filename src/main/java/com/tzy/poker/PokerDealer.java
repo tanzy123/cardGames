@@ -37,18 +37,25 @@ public class PokerDealer implements Dealer {
         getRiver(deck);
     }
 
-    private void getRiver(DeckOfCards deck) {
-        river = deck.deal();
-    }
-
-    private void getTurn(DeckOfCards deck) {
-        turn = deck.deal();
+    public List<Card> getCommunityCards(){
+        List<Card> communityCards = new ArrayList<>(flop);
+        communityCards.add(turn);
+        communityCards.add(river);
+        return communityCards;
     }
 
     private void getFlop(DeckOfCards deck) {
         flop.add(deck.deal());
         flop.add(deck.deal());
         flop.add(deck.deal());
+    }
+
+    private void getRiver(DeckOfCards deck) {
+        river = deck.deal();
+    }
+
+    private void getTurn(DeckOfCards deck) {
+        turn = deck.deal();
     }
 
     public List<Card> getFlop() {
@@ -73,12 +80,5 @@ public class PokerDealer implements Dealer {
 
     public void setRiver(Card river) {
         this.river = river;
-    }
-
-    public List<Card> getCommunityCards(){
-        List<Card> communityCards = new ArrayList<>(flop);
-        communityCards.add(turn);
-        communityCards.add(river);
-        return communityCards;
     }
 }

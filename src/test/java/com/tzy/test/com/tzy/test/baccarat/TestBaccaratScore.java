@@ -1,4 +1,4 @@
-package com.tzy.test;
+package com.tzy.test.com.tzy.test.baccarat;
 
 import com.tzy.baccarat.BaccaratScore;
 import com.tzy.baccarat.BaccaratWinnings;

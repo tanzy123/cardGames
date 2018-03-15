@@ -2,6 +2,7 @@ package com.tzy.cards;
 
 public enum Rank {
 
+    // DO NOT CHANGE THE ORDER OF DECLARATION FOR RANKS
     TWO(2),
     THREE(3),
     FOUR(4),

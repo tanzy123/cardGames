@@ -1,4 +1,4 @@
-package com.tzy.test;
+package com.tzy.test.com.tzy.test.baccarat;
 
 import com.tzy.baccarat.BaccaratDealer;
 import com.tzy.baccarat.BaccaratScore;
@@ -11,7 +11,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CalculateBaccaratTest {
+public class ConsoleOutputCalculateBaccaratTest {
 
     private static final int NUMBER_OF_PLAYERS = 5;
     private static final int NUMBER_OF_ITERATIONS = 1000000;

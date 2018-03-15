@@ -12,9 +12,9 @@ import java.util.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class TestHandCategorizer {
+public class TestDefaultMethodsInHandCategorizer {
 
-    private HandCategorizer handCategorizer;
+    private HandCategorizer defaultHandCategorizer;
     private PokerDealer dealer;
     private DeckOfCards deck;
     private List<Player> players;
@@ -35,29 +35,32 @@ public class TestHandCategorizer {
         dealer.deal(deck, players);
 
 
-        handCategorizer = new HandCategorizer() {
-            @Override
-            public <T> void categorize(T t) {
-
+        defaultHandCategorizer = new HandCategorizer() {
+            public boolean categorize(List<Card> cardsToCategorize) {
+                throw new UnsupportedOperationException();
             }
         };
         p = players.get(0);
-        mapBySuits = handCategorizer.mapBySuits(dealer.getCommunityCards(), p);
-        mapByRank = handCategorizer.mapByRank(dealer.getCommunityCards(), p);
+        List<Card> cardsToBeMapped = new ArrayList<>(dealer.getCommunityCards());
+        cardsToBeMapped.addAll(p.getHand());
+        mapBySuits = defaultHandCategorizer.mapBySuits(cardsToBeMapped);
+        mapByRank = defaultHandCategorizer.mapByRank(cardsToBeMapped);
     }
 
     @Test
-    public void testCorrectNumberOfCommunityCardsAndPlayerHandFromMappingSuits(){
-        int count = 0;
+    public void testCorrectNumberCardsMapped(){
+        int countForSuitsMapping = 0;
+        int countForRankMapping = 0;
         for (Suit s: Suit.values())
-            count += mapBySuits.getOrDefault(s, Collections.emptyList()).size();
-
-
-        assertThat(dealer.getCommunityCards().size()+p.getHand().size(), is(count));
+            countForSuitsMapping += mapBySuits.getOrDefault(s, Collections.emptyList()).size();
+        for (Rank r: Rank.values())
+            countForRankMapping += mapByRank.getOrDefault(r, Collections.emptyList()).size();
+        assertThat(dealer.getCommunityCards().size()+p.getHand().size(), is(countForSuitsMapping));
+        assertThat(dealer.getCommunityCards().size()+p.getHand().size(), is(countForRankMapping));
     }
 
     @Test
-    public void testMappedBySuitsFromMappingSuits(){
+    public void testCorrectCardsFromMappingSuits(){
         for (Suit s: Suit.values()){
             List<Card> cards = mapBySuits.getOrDefault(s, Collections.emptyList());
             for (Card c: cards)
@@ -66,7 +69,7 @@ public class TestHandCategorizer {
     }
 
     @Test
-    public void testMappedByRankFromMappingRank(){
+    public void testCorrectCardsFromMappingRank(){
         for (Rank r: Rank.values()){
             List<Card> cards = mapByRank.getOrDefault(r, Collections.emptyList());
             for (Card c: cards)
@@ -79,7 +82,7 @@ public class TestHandCategorizer {
         Map<Rank, List<Card>> map = new HashMap<>();
         List<Card> cards = Arrays.asList(new Card(Suit.CLUBS, Rank.ACE),new Card(Suit.HEARTS, Rank.ACE), new Card(Suit.DIAMONDS, Rank.ACE));
         map.put(Rank.ACE, cards);
-        assertThat(handCategorizer.hasNumberOfKind(3, map),is(true));
+        assertThat(defaultHandCategorizer.hasNumberOfKind(3, map),is(true));
     }
 
     @Test
@@ -87,7 +90,7 @@ public class TestHandCategorizer {
         Map<Rank, List<Card>> map = new HashMap<>();
         List<Card> cards = Arrays.asList(new Card(Suit.DIAMONDS, Rank.ACE));
         map.put(Rank.ACE, cards);
-        assertThat(handCategorizer.hasNumberOfKind(3, map),is(false));
+        assertThat(defaultHandCategorizer.hasNumberOfKind(3, map),is(false));
     }
 
     @Test
@@ -96,7 +99,7 @@ public class TestHandCategorizer {
         List<Card> cards = Arrays.asList(new Card(Suit.DIAMONDS, Rank.ACE), new Card(Suit.DIAMONDS, Rank.TWO), new Card(Suit.DIAMONDS, Rank.EIGHT),
                 new Card(Suit.DIAMONDS, Rank.NINE), new Card(Suit.DIAMONDS, Rank.SEVEN));
         map.put(Suit.DIAMONDS, cards);
-        assertThat(handCategorizer.hasFlush(map),is(true));
+        assertThat(defaultHandCategorizer.hasFlush(map),is(true));
     }
 
     @Test
@@ -105,7 +108,7 @@ public class TestHandCategorizer {
         List<Card> cards = Arrays.asList(new Card(Suit.DIAMONDS, Rank.TWO), new Card(Suit.DIAMONDS, Rank.EIGHT),
                 new Card(Suit.DIAMONDS, Rank.NINE), new Card(Suit.DIAMONDS, Rank.SEVEN));
         map.put(Suit.DIAMONDS, cards);
-        assertThat(handCategorizer.hasFlush(map),is(false));
+        assertThat(defaultHandCategorizer.hasFlush(map),is(false));
     }
 
     @Test
@@ -114,31 +117,31 @@ public class TestHandCategorizer {
         List<Card> cards = Arrays.asList(new Card(Suit.DIAMONDS, Rank.TWO), new Card(Suit.DIAMONDS, Rank.EIGHT),
                 new Card(Suit.DIAMONDS, Rank.NINE), new Card(Suit.DIAMONDS, Rank.SEVEN));
         map.put(Rank.ACE, cards);
-        assertThat(handCategorizer.hasStraight(map),is(false));
+        assertThat(defaultHandCategorizer.hasStraight(map),is(false));
     }
 
     @Test
     public void testStraightSuccessWithAce1234(){
         List<Card> cards = Arrays.asList(new Card(Suit.DIAMONDS, Rank.TWO), new Card(Suit.DIAMONDS, Rank.ACE), new Card(Suit.SPADES, Rank.FIVE),
                 new Card(Suit.CLUBS, Rank.THREE), new Card(Suit.SPADES, Rank.FOUR), new Card(Suit.HEARTS, Rank.TEN));
-        Map<Rank, List<Card>> map = handCategorizer.mapByRank(cards);
-        assertThat(handCategorizer.hasStraight(map), is(true));
+        Map<Rank, List<Card>> map = defaultHandCategorizer.mapByRank(cards);
+        assertThat(defaultHandCategorizer.hasStraight(map), is(true));
     }
 
     @Test
     public void testStraightSuccess(){
         List<Card> cards = Arrays.asList(new Card(Suit.DIAMONDS, Rank.ACE), new Card(Suit.DIAMONDS, Rank.JACK), new Card(Suit.SPADES, Rank.TEN),
                 new Card(Suit.CLUBS, Rank.SIX), new Card(Suit.SPADES, Rank.KING), new Card(Suit.HEARTS, Rank.QUEEN));
-        Map<Rank, List<Card>> map = handCategorizer.mapByRank(cards);
-        assertThat(handCategorizer.hasStraight(map), is(true));
+        Map<Rank, List<Card>> map = defaultHandCategorizer.mapByRank(cards);
+        assertThat(defaultHandCategorizer.hasStraight(map), is(true));
     }
 
     @Test
     public void testStraightFailNoStraight(){
         List<Card> cards = Arrays.asList(new Card(Suit.DIAMONDS, Rank.QUEEN), new Card(Suit.DIAMONDS, Rank.JACK), new Card(Suit.SPADES, Rank.TEN),
                 new Card(Suit.CLUBS, Rank.SIX), new Card(Suit.SPADES, Rank.KING), new Card(Suit.HEARTS, Rank.QUEEN));
-        Map<Rank, List<Card>> map = handCategorizer.mapByRank(cards);
-        assertThat(handCategorizer.hasStraight(map), is(false));
+        Map<Rank, List<Card>> map = defaultHandCategorizer.mapByRank(cards);
+        assertThat(defaultHandCategorizer.hasStraight(map), is(false));
     }
 
 }

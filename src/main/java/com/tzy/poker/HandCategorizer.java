@@ -9,29 +9,21 @@ import java.util.*;
 
 public interface HandCategorizer {
 
-    default Map<Rank,List<Card>> mapByRank(List<Card> cards){
-        return mapByRank(cards, new Player());
-    }
-
-    default Map<Suit,List<Card>> mapBySuits(List<Card> cards){
-        return mapBySuits(cards, new Player());
-    }
-
-    default Map<Suit, List<Card>> mapBySuits(List<Card> communityCards, Player player) {
-        List<Card> cardsToBeMapped = new ArrayList<>(communityCards);
-        cardsToBeMapped.addAll(player.getHand());
+    default Map<Suit, List<Card>> mapBySuits(final List<Card> cardsToBeMapped) {
         Map<Suit, List<Card>> suitCardMap = new HashMap<>();
-        for (Card c: cardsToBeMapped)
-            suitCardMap.computeIfAbsent(c.getSuit(), suit -> new ArrayList<>()).add(c);
+        for (Card c: cardsToBeMapped) {
+            suitCardMap.computeIfAbsent(c.getSuit(), suit -> new ArrayList<>())
+                       .add(c);
+        }
         return suitCardMap;
     }
 
-    default Map<Rank, List<Card>> mapByRank(List<Card> communityCards, Player player) {
-        List<Card> cardsToBeMapped = new ArrayList<>(communityCards);
-        cardsToBeMapped.addAll(player.getHand());
+    default Map<Rank, List<Card>> mapByRank(final List<Card> cardsToBeMapped) {
         Map<Rank, List<Card>> rankCardMap = new HashMap<>();
-        for (Card c: cardsToBeMapped)
-            rankCardMap.computeIfAbsent(c.getRank(), rank -> new ArrayList<>()).add(c);
+        for (Card c: cardsToBeMapped) {
+            rankCardMap.computeIfAbsent(c.getRank(), rank -> new ArrayList<>())
+                       .add(c);
+        }
         return rankCardMap;
     }
 
@@ -64,7 +56,5 @@ public interface HandCategorizer {
         return false;
     }
 
-    <T> void categorize(T t);
-
-
+    boolean categorize(final List<Card> cardsToCategorize);
 }
